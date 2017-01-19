@@ -3,7 +3,7 @@ module.exports = function(app) {
 	var controller = {};
 
 	controller.listaContatos = function(req, res) {
-		Contato.find().exec()
+		Contato.find().populate('emergencia').exec()
 		.then(function(contatos) {
 			res.json(contatos);
 		}, function(erro) {
@@ -26,21 +26,37 @@ module.exports = function(app) {
 	};
 
 	controller.removeContato = function(req, res) {
-		var idContato = req.params.id;
+		var _id = req.params.id;
 
-		contatos = contatos.filter(function(contato) {
-			return contato._id != idContato;
+		Contato.remove({"_id": _id}).exec()
+		.then(function() {
+			res.status(204).end();
+		}, function(erro) {
+			return console.erro(erro);
 		});
-
-		res.status(204).end();
 	};
 
 	controller.salvaContato = function(req, res) {
-		var contato = req.body;
+		var _id = req.body._id;
 
-		contato = contato._id ? atualiza(contato) : adiciona(contato);
+		req.body.emergencia = req.body.emergencia || null;
 
-		res.json(contato);
+		if (_id) {
+			Contato.findByIdAndUpdate(_id, req.body).exec()
+			.then(function(contato) {
+				res.json(contato);
+			}, function(erro) {
+				console.error(erro);
+				res.status(500).json(erro);
+			});
+		} else {
+			Contato.create(req.body).then(function(contato) {
+				res.status(201).json(contato);
+			}, function(erro) {
+				console.log(erro);
+				res.status(500).json(erro);
+			});
+		}
 	};
 
 	return controller;
