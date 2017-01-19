@@ -12,6 +12,16 @@
 	</head>
 
 	<body class="container">
+		<%if (usuarioLogado.length > 0) { %>
+		<div class="text-align">
+			<p>
+				Logado como: <span id="usuario-logado"><%=usuarioLogado %></span>
+			</p>
+
+			<a href="/logout">Logout</a>
+		</div>
+		<% } %>
+
 		<div ng-view></div>
 
 		<!-- libs -->
